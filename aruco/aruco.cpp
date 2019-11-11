@@ -33,15 +33,34 @@ cv::Point2f coordinatesOfMarker(
 	return coordinates;
 }
 
+const cv::String keys = 
+	"{id | 0 | Camera id }"
+	"{v  |   | Input from video file }";
+
 int main(int argc, char *argv[]) {
+	cv::CommandLineParser parser(argc, argv, keys);
+	parser.about("Object tracking using a ArUco marker");
+
+	int camId = parser.get<int>("id");
+
+	cv::String video;
+	if (parser.has("v")) {
+		video = parser.get<cv::String>("v");
+	}
+
+	if(!parser.check()) {
+		parser.printErrors();
+		return 0;
+	}
+
 	cv::VideoCapture inputVideo;
 	int waitTime = 10;
 
-	if (argc > 1) {
-		inputVideo.open(argv[1]);
+	if (!video.empty()) {
+		inputVideo.open(video);
 		waitTime = 40;
 	} else {
-		inputVideo.open(2);
+		inputVideo.open(camId);
 		waitTime = 40;
 	}
 
