@@ -66,14 +66,13 @@ int main(int argc, char *argv[]) {
 
 		if (ids.size() > 0) {
 			cv::aruco::drawDetectedMarkers(imageCopy, corners, ids);
-			if (totalIterations % 10 == 0) {
-				cv::Point2f coordinates = coordinatesOfMarker(corners);
-				float height = sqrt(
-						pow(abs(corners[0][0].x - corners[0][1].x), 2) +
-						pow(abs(corners[0][0].y - corners[0][1].y), 2));
-				std::cout << "x = " << coordinates.x << " y = " << coordinates.y
-						<< " height = " << height << std::endl;
-			}
+			float height = sqrt(
+					pow(abs(corners[0][0].x - corners[0][1].x), 2) +
+					pow(abs(corners[0][0].y - corners[0][1].y), 2));
+			cv::Point2f coordinates = coordinatesOfMarker(corners);
+			std::vector<float> vels = velocity(coordinates, height,
+					inputVideo.get(cv::CAP_PROP_FRAME_WIDTH));
+			std::cout << vels[0] << " " << vels[1] << std::endl;
 		}
 
 		cv::imshow("out", imageCopy);
