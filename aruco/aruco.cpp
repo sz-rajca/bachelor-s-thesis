@@ -1,6 +1,27 @@
 #include <opencv2/highgui.hpp>
 #include <opencv2/aruco.hpp>
 #include <iostream>
+#include <opencv2/imgproc.hpp>
+
+std::vector<float> velocity(cv::Point2f point, float distance, float windowWidth) {
+	static float previousErrorAngular;
+	static float previousErrorLinear;
+	float kp = 0.01;
+	float kd = 0.001;
+	std::vector<float> result;
+
+	float errorLinear = 100 - distance;
+	float derivativeLinear = (errorLinear - previousErrorLinear) / 0.1;
+	result.push_back(kp * errorLinear + kd * derivativeLinear);
+	previousErrorLinear = errorLinear;
+
+	float errorAngular = windowWidth/2.0 - point.x; // center of a scene
+	float derivativeAngular = (errorAngular - previousErrorAngular) / 0.1;
+	result.push_back(kp * errorAngular + kd * derivativeAngular);
+	previousErrorAngular = errorAngular;
+
+	return result;
+}
 
 cv::Point2f coordinatesOfMarker(
 		const std::vector<std::vector<cv::Point2f>> &corners) {
